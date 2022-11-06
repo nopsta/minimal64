@@ -1,0 +1,37 @@
+Time of Day (TOD) Clock
+-----------------------
+ 
+The Time of Day clock is a 24-hour (AM/PM) clock with 1/10th second resolution. 
+
+It is organized into 4 registers, each register is read/written in BCD format
+
+  d_08  TOD_10THS   10ths of seconds   Bit 0-3: Tenth seconds in BCD-format ($0-$9)
+  d_09  TOD_SEC     Seconds            Bit 0-3: Single seconds in BCD-format ($0-$9)
+                                       Bit 4-6: Ten seconds in BCD-format ($0-$5)
+  d_0a  TOD_MIN     Minutes            Bit 0-3: Single minutes in BCD-format ($0-$9)
+                                       Bit 4-6: Ten minutes in BCD-format ($0-$5)
+  d_0b  TOD_HR      Hours              Bit 0-3: Single hours in BCD-format ($0-$9)
+                                       Bit 4-6: Ten hours in BCD-format ($0-$5)
+                                       Bit 7: Differentiation AM/PM, 0=AM, 1=PM
+
+
+The clock is driven by either a 60Hz or 50Hz (programmable) TTL level input on the TOD pin.
+
+Setting/Reading Time of Day
+---------------------------
+A specific sequence of events must be followed for proper setting and reading of TOD:
+
+- TOD is automatically stopped whenever a write to the Hours register occurs. 
+- The clock will not start again until after a write to the 10ths of seconds register.
+- All four TOD registers latch on a read of Hours and remain latched until after a read of 10ths of seconds
+- The TOD clock continues to count when the output registers are latched
+
+ALARM
+-----
+A programmable ALARM is provided for generating an interrupt at a desired time. 
+
+The ALARM registers are located at the same addresses as the corresponding TOD registers. 
+Access to the ALARM is governed by a Control Register bit. 
+
+The ALARM is write-only; any read of a TOD address will read time regardless of the state of the ALARM access bit
+

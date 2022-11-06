@@ -1,0 +1,24 @@
+Type ID  Name
+------------------------------------
+0        Normal cartridge
+1        Action Replay
+2        KCS Power Cartridge
+3        Final Cartridge III
+4        Simons Basic
+5        Ocean type 1 (256 and 128 Kb)
+6        Expert Cartridge
+7        Fun Play
+8        Super Games
+9        Atomic Power
+10       Epyx Fastload
+11       Westermann
+12       Rex
+13       Final Cartridge I
+14       Magic Formel
+15       C64 Game System
+16       Warpspeed
+17       Dinamic
+18       Zaxxon
+19       Magic Desk, Domark, HES Australia
+20       Super Snapshot 5
+21       COMAL 80

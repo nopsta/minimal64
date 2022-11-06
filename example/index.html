@@ -1,0 +1,146 @@
+<html>
+  <head>
+  </head>
+  <body>
+    <div style="margin-bottom: 10px">
+      <p>A simple M64 Example</p>
+      <p>
+        Only PRGs or CRTs which do not use the C64 Kernal ROM, BASIC ROM and Char ROM will work.<br/>
+        The screen will be black until a PRG/CRT is loaded. 
+      </p>
+    </div>
+    <div style="margin-bottom: 10px">
+      Choose a PRG: <input type="file" id="choosePRG" name="choosePRG" accept=".prg"/>
+      or a CRT: <input type="file" id="chooseCRT" name="chooseCRT" accept=".crt"/>
+    </div>
+    <div>
+      <canvas id="screen"></canvas>
+    </div>
+
+    <div style="margin-top: 10px">
+      Looking for PRGs that don't need Kernal/BASIC/Char ROMs? try these demos:<br/>
+      <a href="https://csdb.dk/release/?id=197429" target="_blank">CopperBooze.prg</a><br/>
+      <a href="https://csdb.dk/release/?id=166659" target="_blank">party_horse.prg</a><br/>
+      <a href="https://csdb.dk/release/?id=118639" target="_blank">daah_those_acid_pills.prg</a><br/>
+    </div>
+
+    <!-- m64 in a single file -->
+    <script src="m64-singlefile.js"></script>
+
+    <!-- javascript function wrappers around the m64 functions -->
+    <!-- look in this file for the m64 api -->
+    <script src="m64-wrappers.js"></script>
+
+    <!-- audio stuff in here to make this file a bit neater -->
+    <script src="m64-webaudio.js"></script>
+
+
+    <script>
+
+      var m64_canvas = document.getElementById('screen');
+
+      // set these when the runtime is initialized
+      var m64_pixelWidth  = 0;
+      var m64_pixelHeight = 0;
+      var m64_context = null;
+      var m64_imageData = null;
+
+
+      m64['onRuntimeInitialized'] = function() { 
+        // m64_getPixelBufferHeight will get the height of the pixel buffer
+        // this may be taller than the height of the rendered pixels, so specify the value
+        m64_pixelWidth  = m64_getPixelBufferWidth();
+        m64_pixelHeight = 272; // going to use PAL
+
+        // set the canvas dimensions
+        m64_canvas.width = m64_pixelWidth;
+        m64_canvas.height = m64_pixelHeight;
+        m64_context = m64_canvas.getContext('2d');
+
+        // make an Image Data object can set to the pixel buffer
+        m64_imageData = m64_context.getImageData(0, 0, m64_pixelWidth, m64_pixelHeight); 
+
+        // emscripten runtime is initialised, so run m64_init
+        // this will initialise the m64 and call m64_reset
+        // 1 = PAL, 2 = use 8580 + digiboost for SID
+        m64_init(1, 2);
+
+        // start the updating
+        // update will be called continuously by requestAnimationFrame
+        update();
+      }
+
+      var m64_lastTimestamp = false;
+
+      function update(timestamp) {
+        if(m64_lastTimestamp !== false) {
+          var dTime = timestamp - m64_lastTimestamp;
+          if(dTime > 200) {
+            // be gentle if browser isn't keeping up
+            dTime = 16.666;
+          }
+
+          if(m64_update(dTime)) {
+            // m64_update will return 1 if the next pixel buffer frame is ready to be displayed
+
+            // get a pointer to the pixel buffer in the heap
+            var pixelBufferPtr = m64_getPixelBuffer();
+            // 4 bytes per pixel
+            let pixelBufferLength = m64_pixelWidth * m64_pixelHeight * 4;
+
+            // get a Uint8Array view into the heap at the location of the pixel buffer
+            let pixelBufferView = new Uint8Array(m64.HEAPU8.subarray(pixelBufferPtr, pixelBufferPtr+pixelBufferLength)); 
+
+            // set the Image Data object
+            m64_imageData.data.set(pixelBufferView);
+
+            // draw Image Data into the screen canvas' context
+            m64_context.putImageData(m64_imageData, 0, 0);
+
+          }
+        }
+        m64_lastTimestamp = timestamp;
+        requestAnimationFrame( update );
+      }
+
+
+      // hook up an event fire if a prg file is chosen
+      document.getElementById('choosePRG').addEventListener('change', function(e) {
+        var file = document.getElementById('choosePRG').files[0];
+        // read the file
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          // get the file data as a Uint8Array
+          var data = new Uint8Array(reader.result);
+          // pass prg data to inject and run
+          // set delay to 0
+          m64_injectAndRunPrg(data, data.length, 0);
+        }
+        reader.readAsArrayBuffer(file);
+
+        // start audio in response to a user action
+        m64_startAudio();
+
+      });
+
+      // hook up an event fire if a crt file is chosen
+      document.getElementById('chooseCRT').addEventListener('change', function(e) {
+        var file = document.getElementById('chooseCRT').files[0];
+        // read the file
+        var reader = new FileReader();
+        reader.onload = function(e) {
+          // get the file data as a Uint8Array
+          var data = new Uint8Array(reader.result);
+          // pass prg data to inject and run
+          // set delay to 0
+          m64_loadCartridge(data, data.length);
+        }
+        reader.readAsArrayBuffer(file);
+
+        // start audio in response to a user action
+        m64_startAudio();
+      });
+
+    </script>
+  </body>
+</html>

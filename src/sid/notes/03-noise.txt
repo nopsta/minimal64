@@ -1,0 +1,17 @@
+https://en.wikipedia.org/wiki/MOS_Technology_6581
+
+The noise generator is implemented as a 23-bit-length Fibonacci LFSR 
+(Feedback polynomial: x^22+x^17+1).[10][11] 
+
+When using noise waveform simultaneously with any other waveform, the pull-down via waveform selector tends to quickly reduce the XOR shift register to 0 for all bits that are connected to the output DAC. As the zeroes shift in the register when the noise is clocked, and no 1-bits are produced to replace them, a situation can arise where the XOR shift register becomes fully zeroed. Luckily, the situation can be remedied by using the waveform control test bit, which in that condition injects one 1-bit into the XOR shift register. Some musicians are also known to use noise's combined waveforms and test bit to construct unusual sounds.
+
+The noise waveform is generated taking the output of eight selected bits from a 23 bit Fibonacci LFSR. 
+There are actually 24 bits on chip but the last one is unused. 
+
+The register is clocked when bit 19 of the oscillator goes high and has taps at bits 17 and 22. 
+
+The register can be "reset" using the test bit: the c1 gate stays open and the output inverters slowly settle high.
+
+The output from bits 0, 2, 5, 9, 11, 14, 18 and 20 is sent to the waveform selector. 
+
+Examination of the noise waveform: https://codebase64.org/doku.php?id=base:noise_waveform

@@ -1,0 +1,25 @@
+Format of a .crt file:
+
+0000-000F - 16-byte cartridge signature  "C64 CARTRIDGE"  (padded with space characters)
+0010-0013 - File header length
+0014-0015 - Cartridge version (high/low, presently 01.00)
+0016-0017 - Cartridge hardware type ($0000, high/low)
+0018      - Cartridge port EXROM line status
+0019      - Cartridge port GAME line status
+001A-001F - Reserved for future use
+0020-003F - 32-byte cartridge name
+0040-xxxx - Cartridge contents : CHIP PACKETS
+
+each chip packet:
+
+0000-0003 - Contained ROM signature "CHIP"
+0004-0007 - Total packet length
+0008-0009 - Chip type
+000A-000B - Bank number ($0000 - normal cartridge)
+000C-000D - Starting load address (high/low format)
+000E-000F - ROM image size in bytes  (high/low  format,  typically $2000 or $4000)
+0010-xxxx - ROM data
+
+
+http://ist.uwaterloo.ca/~schepers/formats/CRT.TXT
+http://www.computerbrains.com/crtformat.htm

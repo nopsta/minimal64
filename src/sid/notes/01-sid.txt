@@ -1,0 +1,26 @@
+SID
+---
+
+
+From Andreas Varga interview with Bob Yannes
+http://sid.kubarth.com/articles/interview_bob_yannes.html
+
+Each "voice" consisted of:
+ an Oscillator, 
+ a Waveform Generator, 
+ a Waveform Selector, 
+ a Waveform D/A converter, 
+ a Multiplying D/A converter for amplitude control 
+ an Envelope Generator for modulation 
+
+The analog output of each voice could be sent through a Multimode Analog Filter or bypass the filter and 
+a final Multiplying D/A converter provided overall manual volume control.
+
+// SID internals documentation
+// https://sourceforge.net/p/sidplay-residfp/wiki/SID%20internals/
+
+// SID Related Links
+// https://sourceforge.net/p/sidplay-residfp/wiki/Links/
+
+// understanding the SID
+// http://forum.6502.org/viewtopic.php?f=8&t=4150

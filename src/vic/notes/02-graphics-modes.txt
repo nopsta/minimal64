@@ -1,0 +1,119 @@
+Graphics Modes
+--------------
+
+The Graphics Mode is determined by bits 5 (BMM) and 6 (ECM) of vicii register 0xd011 and bit 4 (MCM) of register 0xd016
+
+0xd011 VICII Control register 1
+-------------------------------
+bit 0: Vertical Scroll
+bit 1: Vertical Scroll
+bit 2: Vertical Scroll
+bit 3: Row Select (RSEL)
+bit 4: Display Enable (DEN)
+bit 5: Bitmap Mode (BMM)
+bit 6: Extended Color Mode (ECM)
+bit 7: Raster Bit 8
+
+0xd016 VICII Control Register 2
+-------------------------------
+bit 0: Horizonal Scroll
+bit 1: Horizonal Scroll
+bit 2: Horizonal Scroll
+bit 3: Column Select (CSEL)
+bit 4: Multicolor Mode (MCM)
+bit 5: RES - not used
+bit 6: - not used
+bit 7: - not used
+
+
+ECM  BMM  MCM  Mode
+----------------------------------------
+  0    0    0  Standard Character Mode
+  0    0    1  Multicolor Character Mode
+  0    1    0  Standard Bitmap Mode
+  0    1    1  Multicolor Bitmap Mode
+  1    0    0  Extended Background Color Mode
+  1    0    1  Invalid Mode
+  1    1    0  Invalid Mode
+  1    1    1  Invalid Mode
+
+
+Video Matrix and Color RAM
+--------------------------
+
+The Video Matrix and Color RAM are used by all Graphics Modes
+
+Video Matrix (Screen RAM) 1000 (40x25) bytes in row-major order. Each byte represents a cell in the 40x25 grid 
+The Video Matrix exists in System RAM and can be relocated
+The Location of the Video Matrix is determined by the bits 4-7 of the VICII Memory Setup Register ($d018) and the location of the VICII Bank set in bits 0 and 1 of CIA 2 Register $dd00
+
+Color RAM 1000 bytes in row-major order. Only bits 0-3 of each byte is used
+Color RAM is always at the address ($d800-$dbff)
+
+Standard Character Mode
+-----------------------
+40 or 38 columns of characters (determined by CSEL bit of $d016)
+25 or 24 rows of characters (determined by RSEL bit of $d011)
+Each Character is 8x8 pixels
+One background color defined in VICII Register $d021
+One Foreground Color Per Character defined in Color RAM ($d800-$dbff). One byte per character, high nibble is unused
+1000 (40x25) byte Video Matrix determines which character in each location
+
+Multicolor Character Mode
+-------------------------
+40 or 38 columns of characters (determined by CSEL bit of $d016)
+25 or 24 rows of characters (determined by RSEL bit of $d011)
+Foreground Color Per Character defined in Color RAM ($d800-$dbff).
+If the Foreground Color is < 8, the character will be displayed as in Standard Character Mode
+If the Foreground Color is > 7, the character will be displayed in Multicolor Mode:
+
+  4x8 pixels per character, pixels are 'double-width' where each pixel color is defined by 2 bits:
+
+  00 - background color from $d021
+  01 - the color set in VIC Register $d022
+  10 - the color set in VIC Register $d023
+  11 - the color defined in color RAM ($d800-$dbff) for the character's locattion
+
+The Location of the Video Matrix is determined by the bits 4-7 of the VICII Memory Setup Register ($d018) and the location of the VICII Bank set in bits 0 and 1 of CIA 2 Register $dd00
+
+Standard Bitmap Mode
+--------------------
+320x200 bitmap, each 8x8 square can have 1 foreground and 1 background color
+8KB (300x200 kilobits) of bitmap data, pointer to bitmap memory is set in bit 3 of VIC Memory Setup Register $d018
+Color data comes from the 1000 (40x25) byte video matrix:
+  bits 0-3 define the background color
+  bits 4-7 define the foreground color
+for the corresponding 8x8 square
+
+Multicolor Bitmap Mode
+----------------------
+160x200 bitmap
+As per Standard Bitmap Mode except pixels are double width, the color used for each pixel is determined by 2 bits from the bitmap
+
+  00 - background color from $d021
+  01 - use bits 4-7 from the corresponding position in the video matrix
+  10 - use bits 0-3 from the corresponding position in the video matrix 
+  11 - use bits 0-3 from the corresponding position in color ram
+
+Extended Background Color Mode
+------------------------------
+Standard Character Mode
+-----------------------
+40 or 38 columns of characters (determined by CSEL bit of $d016)
+25 or 24 rows of characters (determined by RSEL bit of $d011)
+Each Character is 8x8 pixels
+One Foreground Color Per Character defined in Color RAM ($d800-$dbff). One byte per character, high nibble is unused
+bits 0-6 of 1000 (40x25) byte Video Matrix determines which character in each location (64 possible characters)
+One of four background colors determined by the upper 2 bits of the corresponding location in the Video Matrix
+
+bits 7-8 of a byte in video matrix:
+
+  00 - background color is in $d011
+  01 - background color is in $d012
+  02 - background color is in $d013
+  03 - background color is in $d014
+
+
+
+
+

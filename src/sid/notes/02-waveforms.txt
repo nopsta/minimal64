@@ -1,0 +1,29 @@
+Accumulator
+-----------
+
+Each clock cycle produces a new N-bit output consisting of the previous output obtained from the register summed with the 
+frequency control word (FCW) which is constant for a given output frequency.
+
+from http://sid.kubarth.com/articles/interview_bob_yannes.html
+
+As I recall, the Oscillator is a 24-bit phase-accumulating design of which the lower 16-bits are programmable for pitch control. 
+The output of the accumulator goes directly to a D/A converter through a waveform selector. 
+Normally, the output of a phase-accumulating oscillator would be used as an address into memory which contained a wavetable, 
+but SID had to be entirely self-contained and there was no room at all for a wavetable on the chip.
+
+The Sawtooth waveform was created by sending the upper 12-bits of the accumulator to the 12-bit Waveform D/A.
+
+The Triangle waveform was created by using the MSB of the accumulator to invert the remaining upper 11 accumulator bits using EXOR gates. 
+These 11 bits were then left-shifted (throwing away the MSB) and sent to the Waveform D/A (so the resolution of the triangle waveform was 
+half that of the sawtooth, but the amplitude and frequency were the same).
+
+The Pulse waveform was created by sending the upper 12-bits of the accumulator to a 12-bit digital comparator. 
+The output of the comparator was either a one or a zero. This single output was then sent to all 12 bits of the Waveform D/A.
+
+The Noise waveform was created using a 23-bit pseudo-random sequence generator (i.e., a shift register with specific outputs fed back to
+the input through combinatorial logic).The shift register was clocked by one of the intermediate bits of the accumulator to keep the 
+frequency content of the noise waveform relatively the same as the pitched waveforms. The upper 12-bits of the shift register were sent 
+to the Waveform D/A.
+
+Combined waveforms
+------------------

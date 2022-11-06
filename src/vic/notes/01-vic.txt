@@ -1,0 +1,20 @@
+
+
+In the character display mode, the VIC fetches CHARACTER POINTERS from the VIDEO MATRIX area of memory and translates the pointers to
+character dot addresses in the 2,048 byte CHARACTER BASE area of memory. The video matrix is comprised of 1,000 consecutive
+locations in memory which each contain an eight bit character pointer. The location of the video matrix within memory is defined 
+by bits VM13-VM10 in register 24 ($18) which are used as the 4 MSB of the video matrix address. The lower order 10 bits are provided
+by an internal couiter (VC9-VC0) which steps through the 1000 character locations. 
+
+
+The eight bit character pointer permits 256 different .character definitions to be available simultaneously. Each character is an
+8x8 matrix of dots stored in the character base as eight consecutive bytes. The location of the character base is defined by bits
+CB13-CB11 in register 24 ($18) which are used for the 3 most significant bits (MSB) of the character base address. The 11 lower
+order addresses are formed by the 8 bit character pointer from the video matrix (D7-D0) which selects a particluar character, and a 3
+bit raster counter (RC2-RC0) which selects one of the eight character bytes. The resulting characters are formated as 25 rows
+of 40 characters each. In addition to the 8 bit character pointer, a 4-bit COLOR NYBBLE is associated with each video matrix location
+(the video matrix memory is 12 bits wide) which selects one of sixteen colors for each character.
+
+
+6567 VIDEO IHTKRFACE CHIP SPECIFICATION SHEET
+http://www.zimmers.net/anonftp/pub/cbm/documents/chipdata/6567_vicII_preliminary.pdf

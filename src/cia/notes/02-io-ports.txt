@@ -1,0 +1,56 @@
+I/O Ports (PRA, PRB, DDRA, DDRB)
+--------------------------------
+
+Each CIA chip has 2 8-bit ports, Port A and Port B. 
+The pins on the CIA chips for these ports are referred to by PA0-7 and PB0-7.
+
+Ports A and B each consists of an 8-bit Peripheral Data Register (PR) and and 8-bit Data Direction
+Register (DDR). 
+- If a bit in the DDR is set to the ONE, corresponding bit in the PR is an output
+- If a DDR bit is set to ZERO, the corresponding PR bit is defined as input. 
+
+On a READ, the PR reflects the information present on the actual port pins (PA0-7, PB0-7) for both input and output bits.
+
+In addition to normal I/O operation, PB6 and PB7 also provide timer output functions (depends on Control Registers, see 03-interval-timers.txt).
+
+CIA 1 I/O Ports: Read keyboard/joystick/paddles/lightpen
+--------------------------------------------------------
+PRA   Data Port A             $dc00
+  read 
+    bits 0-3: set to 0 if a joystick in port 2 direction has been pressed
+    bit    4: set to 0 if joystick port 2 fire button is pushed
+  write
+    bits 0-7: select a column of the keyboard matrix
+    bits 6-7: Paddle Selection 01 = port A, 10 = port b
+PRB   Data Port B             $dc01
+  read
+    bits 0-7: bit will be 0 if a key is pressed in the corresponding row for the column selected with $dc00
+    bits 0-3: set to 0 if a joystick in port 1 direction is pushed
+    bit    4: set to 0 if joystick port 1 fire button is pushed
+  write
+    bit    6: timer a toggle/pulse output
+    bit    7: timer b toggle/pulse output
+DDRA  Data Direction Port A   $dc02
+DDRB  Data Direction Port B   $dc03
+
+CIA 2 I/O Ports: VIC Bank Selection, Serial Bus I/O, User Port, RS-232
+----------------------------------------------------------------------
+PRA   Data Port A             $dd00
+  bits 0-1: VIC bank Selection
+  bit    2: RS-232 Data Output (user port)
+  bit    3: Serial Bus ATN Signal Ouput (0 = high)
+  bit    4: Serial Bus Clock Pulse Output (0 = high)
+  bit    5: Serial Bus Data Output (0 = high)
+  bit    6: Serial Bus Clock pulse Input (1 = high)
+  bit    7: Serial Bus Data In (1 = high)
+PRB   Data Port B             $dd01
+  bit    0: User/RS-232 Received Data (RXD)
+  bit    1: User/RS-232 Request To Send (RTS)
+  bit    2: User/RS-232 Data Terminal Ready (DTR)
+  bit    3: User/RS-232 Ring Indicator (RI)
+  bit    4: User/RS-232 Carrier Detect (DCD)
+  bit    5: User/RS-232 User H
+  bit    6: User/RS-232 Clear To Send (CTS)
+  bit    7: User/RS-232 Data Set Ready (DSR)
+DDRA  Data Direction Port A   $dd02
+DDRB  Data Direction Port B   $dd03

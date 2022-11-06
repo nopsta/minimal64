@@ -1,0 +1,155 @@
+Timing information from http://www.zimmers.net/cbmpics/cbm/c64/vic-ii.txt
+                        http://www.zimmers.net/anonftp/pub/cbm/documents/chipdata/pal.timing 
+
+          | Video  | # of  | Visible | Cycles/ |  Visible
+   Type   | system | lines |  lines  |  line   | pixels/line
+ ---------+--------+-------+---------+---------+------------
+   6569   |  PAL-B |  312  |   284   |   63    |    403
+
+          | First  |  Last  |              |   First    |   Last
+          | vblank | vblank | First X coo. |  visible   |  visible
+   Type   |  line  |  line  |  of a line   |   X coo.   |   X coo.
+ ---------+--------+--------+--------------+------------+-----------
+   6569   |  300   |   15   |  404 ($194)  | 480 ($1e0) | 380 ($17c)   
+
+
+1 clock cycle = 8 pixels = 1 pixel line of a character, 
+phi (1 clock phase) = half cycle = 4 pixels
+
+63 cycles per line
+
+Timing table
+------------
+The following is a table of what happens on each 1/2 cycle of a raster line
+
+Video matrix/color ram access will only occur when the bad line condition is met.
+Sprite pointer/data access will only happen if the sprite is enabled.
+
+cycle-phi (raster x-coord)     vic ii action
+---------------------------------------------------
+1-1       ( 404 )              read sprite 3 pointer           
+1-2       ( 408 )              read sprite 3 data 
+2-1       ( 412 )              read sprite 3 data 
+2-2       ( 416 )              read sprite 3 data 
+3-1       ( 420 )              read sprite 4 pointer
+3-2       ( 424 )              read sprite 4 data 
+4-1       ( 428 )              read sprite 4 data 
+4-2       ( 432 )              read sprite 4 data 
+5-1       ( 436 )              read sprite 5 pointer
+5-2       ( 440 )              read sprite 5 data 
+6-1       ( 444 )              read sprite 5 data 
+6-2       ( 448 )              read sprite 5 data 
+7-1       ( 452 )              read sprite 6 pointer
+7-2       ( 456 )              read sprite 6 data 
+8-1       ( 460 )              read sprite 6 data 
+8-2       ( 464 )              read sprite 6 data 
+9-1       ( 468 )              read sprite 7 pointer
+9-2       ( 472 )              read sprite 7 data 
+10-1      ( 476 )              read sprite 7 data 
+10-2      ( 480 )              read sprite 7 data                     <----- first visible x coord
+11-1      ( 484 )              dram refresh
+11-2      ( 488 )
+12-1      ( 492 )              dram refresh
+12-2      ( 496 )
+13-1      ( 500 )              dram refresh
+13-2      (   0 )                                                     <----- x coordinate 0
+14-1      (   4 )              dram refresh                           <----- set vc to vcbase
+14-2      (   8 )
+15-1      (  12 )              dram refresh                           <----- sprite crunch cycle
+15-2      (  16 )              video matrix/color ram access  [  0 ]
+16-1      (  20 )              char gen/bitmap access         [  0 ]
+16-2      (  24 )    [  0 ]    video matrix/color ram access  [  1 ]  <------ video matrix display start, sprite dma finish (set sprite mcbase = mc)
+17-1      (  28 )    [  0 ]    char gen/bitmap access         [  1 ]
+17-2      (  32 )    [  1 ]    video matrix/color ram access  [  2 ]
+18-1      (  36 )    [  1 ]    char gen/bitmap access         [  2 ]
+18-2      (  40 )    [  2 ]    video matrix/color ram access  [  3 ]
+19-1      (  44 )    [  2 ]    char gen/bitmap access         [  3 ]
+19-2      (  48 )    [  3 ]    video matrix/color ram access  [  4 ]
+20-1      (  52 )    [  3 ]    char gen/bitmap access         [  4 ]
+20-2      (  56 )    [  4 ]    video matrix/color ram access  [  5 ]
+21-1      (  60 )    [  4 ]    char gen/bitmap access         [  5 ]
+21-2      (  64 )    [  5 ]    video matrix/color ram access  [  6 ]
+22-1      (  68 )    [  5 ]    char gen/bitmap access         [  6 ]
+22-2      (  72 )    [  6 ]    video matrix/color ram access  [  7 ]
+23-1      (  76 )    [  6 ]    char gen/bitmap access         [  7 ]
+23-2      (  80 )    [  7 ]    video matrix/color ram access  [  8 ]
+24-1      (  84 )    [  7 ]    char gen/bitmap access         [  8 ]
+24-2      (  88 )    [  8 ]    video matrix/color ram access  [  9 ]
+25-1      (  92 )    [  8 ]    char gen/bitmap access         [  9 ]
+25-2      (  96 )    [  9 ]    video matrix/color ram access  [ 10 ]
+26-1      ( 100 )    [  9 ]    char gen/bitmap access         [ 10 ]
+26-2      ( 104 )    [ 10 ]    video matrix/color ram access  [ 11 ]
+27-1      ( 108 )    [ 10 ]    char gen/bitmap access         [ 11 ]
+27-2      ( 112 )    [ 11 ]    video matrix/color ram access  [ 12 ]
+28-1      ( 116 )    [ 11 ]    char gen/bitmap access         [ 12 ]
+28-2      ( 120 )    [ 12 ]    video matrix/color ram access  [ 13 ]
+29-1      ( 124 )    [ 12 ]    char gen/bitmap access         [ 13 ]
+29-2      ( 128 )    [ 13 ]    video matrix/color ram access  [ 14 ]
+30-1      ( 132 )    [ 13 ]    char gen/bitmap access         [ 14 ]
+30-2      ( 136 )    [ 14 ]    video matrix/color ram access  [ 15 ]
+31-1      ( 140 )    [ 14 ]    char gen/bitmap access         [ 15 ]
+31-2      ( 144 )    [ 15 ]    video matrix/color ram access  [ 16 ]
+32-1      ( 148 )    [ 15 ]    char gen/bitmap access         [ 16 ]
+32-2      ( 152 )    [ 16 ]    video matrix/color ram access  [ 17 ]
+33-1      ( 156 )    [ 16 ]    char gen/bitmap access         [ 17 ]
+33-2      ( 160 )    [ 17 ]    video matrix/color ram access  [ 18 ]
+34-1      ( 164 )    [ 17 ]    char gen/bitmap access         [ 18 ]
+34-2      ( 168 )    [ 18 ]    video matrix/color ram access  [ 19 ]
+35-1      ( 172 )    [ 18 ]    char gen/bitmap access         [ 19 ]
+35-2      ( 176 )    [ 19 ]    video matrix/color ram access  [ 20 ]
+36-1      ( 180 )    [ 19 ]    char gen/bitmap access         [ 20 ]
+36-2      ( 184 )    [ 20 ]    video matrix/color ram access  [ 21 ]
+37-1      ( 188 )    [ 20 ]    char gen/bitmap access         [ 21 ]
+37-2      ( 192 )    [ 21 ]    video matrix/color ram access  [ 22 ]
+38-1      ( 196 )    [ 21 ]    char gen/bitmap access         [ 22 ]
+38-2      ( 200 )    [ 22 ]    video matrix/color ram access  [ 23 ]
+39-1      ( 204 )    [ 22 ]    char gen/bitmap access         [ 23 ]
+39-2      ( 208 )    [ 23 ]    video matrix/color ram access  [ 24 ]
+40-1      ( 212 )    [ 23 ]    char gen/bitmap access         [ 24 ]
+40-2      ( 216 )    [ 24 ]    video matrix/color ram access  [ 25 ]
+41-1      ( 220 )    [ 24 ]    char gen/bitmap access         [ 25 ]
+41-2      ( 224 )    [ 25 ]    video matrix/color ram access  [ 26 ]
+42-1      ( 228 )    [ 25 ]    char gen/bitmap access         [ 26 ]
+42-2      ( 232 )    [ 26 ]    video matrix/color ram access  [ 27 ]
+43-1      ( 236 )    [ 26 ]    char gen/bitmap access         [ 27 ]
+43-2      ( 240 )    [ 27 ]    video matrix/color ram access  [ 28 ]
+44-1      ( 244 )    [ 27 ]    char gen/bitmap access         [ 28 ]
+44-2      ( 248 )    [ 28 ]    video matrix/color ram access  [ 29 ]
+45-1      ( 252 )    [ 28 ]    char gen/bitmap access         [ 29 ]
+45-2      ( 256 )    [ 29 ]    video matrix/color ram access  [ 30 ]
+46-1      ( 260 )    [ 29 ]    char gen/bitmap access         [ 30 ]
+46-2      ( 264 )    [ 30 ]    video matrix/color ram access  [ 31 ]
+47-1      ( 268 )    [ 30 ]    char gen/bitmap access         [ 31 ]
+47-2      ( 272 )    [ 31 ]    video matrix/color ram access  [ 32 ]
+48-1      ( 276 )    [ 31 ]    char gen/bitmap access         [ 32 ]
+48-2      ( 280 )    [ 32 ]    video matrix/color ram access  [ 33 ]
+49-1      ( 284 )    [ 32 ]    char gen/bitmap access         [ 33 ]
+49-2      ( 288 )    [ 33 ]    video matrix/color ram access  [ 34 ]
+50-1      ( 292 )    [ 33 ]    char gen/bitmap access         [ 34 ]
+50-2      ( 296 )    [ 34 ]    video matrix/color ram access  [ 35 ]
+51-1      ( 300 )    [ 34 ]    char gen/bitmap access         [ 35 ]
+51-2      ( 304 )    [ 35 ]    video matrix/color ram access  [ 36 ]
+52-1      ( 308 )    [ 35 ]    char gen/bitmap access         [ 36 ]
+52-2      ( 312 )    [ 36 ]    video matrix/color ram access  [ 37 ]
+53-1      ( 316 )    [ 36 ]    char gen/bitmap access         [ 37 ]
+53-2      ( 320 )    [ 37 ]    video matrix/color ram access  [ 38 ]
+54-1      ( 324 )    [ 37 ]    char gen/bitmap access         [ 38 ]
+54-2      ( 328 )    [ 38 ]    video matrix/color ram access  [ 39 ]
+55-1      ( 332 )    [ 38 ]    char gen/bitmap access         [ 39 ]  <----- sprite dma start
+55-2      ( 336 )    [ 39 ]
+56-1      ( 340 )    [ 39 ]    idle                                   <----- video matrix end, sprite dma start
+56-2      ( 344 )
+57-1      ( 348 )              idle
+57-2      ( 352 )
+58-1      ( 356 )              read sprite 0 pointer                  <----- check which sprites should be displayed, update rc if display active
+58-2      ( 360 )              read sprite 0 data
+59-1      ( 364 )              read sprite 0 data
+59-2      ( 368 )              read sprite 0 data
+60-1      ( 372 )              read sprite 1 pointer
+60-2      ( 376 )              read sprite 1 data
+61-1      ( 380 )              read sprite 1 data
+61-2      ( 384 )              read sprite 1 data
+62-1      ( 388 )              read sprite 2 pointer
+62-2      ( 392 )              read sprite 2 data
+63-1      ( 396 )              read sprite 2 data
+63-2      ( 400 )              read sprite 2 data

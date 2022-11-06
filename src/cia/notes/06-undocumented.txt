@@ -1,0 +1,5 @@
+from https://en.wikipedia.org/wiki/MOS_Technology_CIA
+
+Due to a bug in many 6526s (see also errata below), the alarm IRQ would not always occur when the seconds component of the alarm time is exactly zero.
+
+many CIAs exhibited a defect in which the part would fail to generate a timer B hardware interrupt if the interrupt control register (ICR) was read one or two clock cycles before the time when the interrupt should have actually occurred

@@ -1,0 +1,58 @@
+CIA Interrupts
+--------------
+
+There are five sources of interrupts on the 6526:
+- underflow from TIMER A 
+- underflow from TIMER B
+- TOD ALARM
+- Serial Port full/empty 
+- /FLAG. 
+
+CIA 1 Interrupts are IRQ interrupts (connected to the CPU IRQ line)
+CIA 2 Interrupts are NMI interrupts (connected to the CPU NMI line)
+
+The Interrupt Control Register (ICR) (0xd_0d)
+---------------------------------------------
+
+The ICR provides masking (on write) and interrupt information (on read).
+
+The Interrupt Control Register consists of a write-only MASK register and a read-only DATA register. 
+
+Any interrupt will set the corresponding bit in the DATA register. 
+
+Any interrupt which is enabled by the MASK register will set the IR bit (MSB) of the DATA register and bring the /IRQ pin low. 
+
+In a multi-chip system, the IR bit can be polled to detect which chip has generated an interrupt request. 
+
+The interrupt DATA register is cleared and the /IRQ line returns high following a read of the DATA register. 
+
+Since each interrupt sets an interrupt bit regardless of the MASK, and each interrupt bit can be selectively masked to prevent
+the generation of a processor interrupt, it is possible to intermix polled interrupts with true interrupts.
+
+Polling the IR bit will cause the DATA register to clear.
+
+When writing to the Mask:
+- if bit 7 (SET/CLEAR) of data written is a ZERO, any mask bit written with a ONE will be cleared, while those mask bits written with a ZERO will be unaffected. 
+- If bit 7 of the data written is a ONE, any mask bit written with a ONE will be set, while those mask bits written with a ZERO will be unaffected. 
+
+In order for an interrupt flag to set IR and generate an Interrupt Request, the corresponding MASK bit must be set
+
+Read: (Bit0..4 = INT DATA, Origin of the interrupt)
+Bit 0: 1 = Underflow Timer A
+Bit 1: 1 = Underflow Timer B
+Bit 2: 1 = Time of day and alarm time is equal
+Bit 3: 1 = SDR full or empty, so full byte was transferred, depending of operating mode serial bus
+Bit 4: 1 = IRQ Signal occured at FLAG-pin (cassette port Data input, serial bus SRQ IN)
+Bit 5..6: always 0
+Bit 7: 1 = IRQ An interrupt occured, so at least one bit of INT MASK and INT DATA is set in both registers.
+
+Write: (Bit 0..4 = INT MASK, Interrupt mask)
+Bit 0: 1 = Interrupt release through timer A underflow
+Bit 1: 1 = Interrupt release through timer B underflow
+Bit 2: 1 = Interrupt release if clock=alarmtime
+Bit 3: 1 = Interrupt release if a complete byte has been received/sent.
+Bit 4: 1 = Interrupt release if a positive slope occurs at the FLAG-Pin.
+Bit 5..6: unused
+Bit 7: Source bit. 0 = set bits 0..4 are clearing the according mask bit. 1 = set bits 0..4 are setting the according mask bit. If all bits 0..4 are cleared, there will be no change to the mask.
+
+

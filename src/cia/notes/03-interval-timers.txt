@@ -1,0 +1,82 @@
+Interval Timers (Timer A, Timer B)
+----------------------------------
+
+Each interval timer consists of a 16-bit read-only Timer Counter and a 16-bit write-only Timer Latch. 
+- Data written to the timer are latched in the Timer Latch 
+- Data read from the timer are present contents of the Timer Counter
+
+
+Timer Control Registers (CRA, CRB)
+----------------------------------
+
+Each timer has an associated control Register
+
+Control Register A (CRA)
+------------------------
+
+bit 0:  START    1 = Start Timer A, 0 = Stop Timer A
+                 This bit is automatically reset when underflow occurs during one-shot mode
+
+bit 1:  PBON     PB On/Off
+                 - A control bit allows the timer output to appear on a PORT B output line (PB6 for TIMER A and PB7 for TIMER B)
+                 - This function overrides the DDRB control bit and forces the appropriate PB line to an output
+
+bit 2:  OUTMODE  Toggle/Pulse 1 = toggle, 0 = pulse
+                 - Selects the output applied to PORT B. 
+                 - On every timer underflow the output can either toggle or generate a single positive pulse of one cycle duration. 
+                 - The Toggle output is set high whenever the timer is started and is set low by /RES
+
+bit 3:  RUNMODE  One-Shot/Continuous 1 = one-shot, 0 = continuous
+                 - In one-shot mode, the timer will count down from latched value to zero, generate the interrupt, reload the latched value, then stop
+                 - In continuous mode, the timer will count from latched value to zero, generate interrupt, reload the latched value and
+                   repeat the procedure continuously.
+
+bit 4:  LOAD     1 = Force Load
+                 - A strobe bit (not stored, cant be read back)
+                 - allows the timer latch to be loaded into the timer counter at any time, whether the timer is running of not.
+
+bit 5:  INMODE   1 = Timer A counts positive external pulses applied to CNT pin CNT Transitions
+                 0 = Timer A counts phi2 clock pulses
+
+bit 6:  SPMODE   1 = SERIAL PORT output (CNT sources shift clock)
+                 0 = SERIAL PORT input (external shift clock required).
+
+bit 7:  TODIN    1 = 50Hz clock required on TOD pin for accurate time.
+                 0 = 60Hz clock required on TOD pin for accurate time
+
+Control Register A (CRB)
+------------------------
+
+bit 0:  START    1 = Start Timer B, 0 = Stop Timer B
+                 This bit is automatically reset when underflow occurs during one-shot mode
+
+bit 1:  PBON     PB On/Off
+                 - A control bit allows the timer output to appear on a PORT B output line (PB7 for TIMER B)
+                 - This function overrides the DDRB control bit and forces the appropriate PB line to an output
+
+bit 2:  OUTMODE  Toggle/Pulse 1 = toggle, 0 = pulse
+                 - Selects the output applied to PORT B. 
+                 - On every timer underflow the output can either toggle or generate a single positive pulse of one cycle duration. 
+                 - The Toggle output is set high whenever the timer is started and is set low by /RES
+
+bit 3:  RUNMODE  One-Shot/Continuous 1 = one-shot, 0 = continuous
+                 - In one-shot mode, the timer will count down from latched value to zero, generate the interrupt, reload the latched value, then stop
+                 - In continuous mode, the timer will count from latched value to zero, generate interrupt, reload the latched value and
+                   repeat the procedure continuously.
+
+bit 4:  LOAD     1 = Force Load
+                 - A strobe bit (not stored, cant be read back)
+                 - allows the timer latch to be loaded into the timer counter at any time, whether the timer is running of not.
+
+bit 5,6:INMODE   00 = Timer B counts phi2 pulses
+                 01 = Timer B counts positive CNT transitions.
+                 10 = Timer B counts TIMER A underflow pulses.
+                 11 = Timer B counts TIMER A underflow pulses while CNT is high.
+
+bit 7:  ALARM    1 = writing to TOD registers sets ALARM
+                 0 = writing to TOD registers sets TOD clock
+
+
+The timer latch is loaded into the timer on any timer underflow, on a force load or following a write
+to the high byte of the prescaler while the timer is stopped. If the timer is running, a write to the high
+byte will load the timer latch, but not reload the counter.

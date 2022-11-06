@@ -1,0 +1,70 @@
+Mapping Cartridges to memory
+----------------------------
+
+The EXROM and GAME pins on the cartridge port will determine where in memory 
+a cartidge is seen. A cartridge can map one or two 8KB banks of ROM into the system.
+
+Different cartridge types will have different configurations of values for EXROM and GAME.
+
+Typically, cartridge ROM is banked into:
+  $8000-$9FFF (8KB ROM LO)
+  $A000-$BFFF (8KB ROM HI)
+
+Ultimax mode cartridges are banked in at $8000-$9fff and $E000-$FFFF
+
+Standard C64 cartridges are 8KB (ROM LO only) and 16KB (8KB ROM LO + 8KB ROM HI)
+Other cartridge formats can bank different areas of their memory into ROM LO and ROM HI
+
+8K Cartridge, $8000-$9FFF (8KB ROM LO).
+GAME = 1, EXROM = 0
+
+16K Cartridge, $8000-$9FFF (8KM ROM LO) / $A000-$BFFF (8KB ROM HI)
+GAME = 0, EXROM = 0
+
+Ultimax mode 16K Cartridge, $8000-$9FFF (8KB ROM LO) / $E000-$FFFF (8KB ROM HI). 
+GAME = 0, EXROM = 1
+
+see memory/notes/pla.txt for more information
+
+also: https://www.c64-wiki.com/wiki/Bank_Switching
+
+
+Cartridge Bank Switching
+------------------------
+
+Cartridges can get around the 16KB limit with bank switching. A cartridge may contain
+one or more  banks of ROM (usually 8KB in size) each of which can switched in to appear in 
+the ROM LO or ROM HI areas.
+
+Bank switching is usually done by writing to the IO area, 
+
+eg for Ocean Type Cartridges 
+
+  Ocean Cartridge Sizes: 128KB, 256KB or 512KB sizes (16, 32 or 64 banks of 8KB each)
+
+  Bank switching is done by writing to $DE00. The lower six bits give the
+  bank number (ranging from 0-63). Bit 8 in this selection word is always
+  set. Banks in the lower 128KB are banked into $8000-$9fff, 
+  Banks into the upper 128KB are banked into $a000-bfff
+
+
+Kernal Startup Routine and Cartridge Detection
+----------------------------------------------
+
+On power on, NMI and RES are triggered by a NE556 timer chip.
+When RES is triggered, the CPU will jump to the location pointed to by the Reset Vector at $fffc
+
+For the standard c64 kernal, the vector at $fffc points to the system reset routine at $fce2
+
+This routine will:
+- load the x register with the value $ff
+- disable interrupts with sei
+- transfer the x register to the stack
+- clear the decimal flag
+- load the x register with the value $05
+- check the bytes starting at address $8004 for the catridge signature bytes 'CBM80'
+- if the signature is present, jump to the vector at $8000
+- if signature is not present, continue with normal startup
+
+If a cartridge is mapped to $F000-$FFFF, the CPU will jump to the reset vector provided by the cartridge
+

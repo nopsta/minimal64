@@ -1,0 +1,29 @@
+Programmable Logic Array (PLA)
+------------------------------
+
+The PLA is responsible for dictating the memory map of the C64 and enables the implementation of bank switching.
+
+The C64 has 64KB RAM, 8KB Kernal ROM, 8KB BASIC ROM, 4KB Character ROM, 4KB of I/O Registers as well as an expansion/cartridge port.
+
+The MOS 6510 can access 65536 Memory Locations ($0000-$ffff). 
+
+The PLA is responsible for mapping banks of the 64KB RAM, 20KB ROM, I/O Registers and expansion/cartridge port onto the 64KB addressable by the CPU.
+
+The PLA is connected to the CPU control lines and the expansion port which, together, dictate which areas of memory are banked.
+
+CPU Control lines
+-----------------
+
+LORAM
+HIRAM
+CHAREN
+
+Expansion Port lines
+--------------------
+
+GAME (pin 8)
+EXROM (pin 9)
+
+see https://www.c64-wiki.com/wiki/Bank_Switching for mapping table
+
+http://www.zimmers.net/anonftp/pub/cbm/documents/chipdata/c64-pla.txt

@@ -1,0 +1,85 @@
+CIA
+---
+The C64 has 2 x MOS 6526 Complex Interface Adapter (CIA) Chips: CIA 1, CIA 2
+
+The CIA chips provide I/O and timing capabilities:
+
+- 16 Individually programmable I/O lines (2 x 8-bit ports A and B), in the C64 the I/O lines are used to:
+   - read I/O devices such as keyboard, joystick, paddles (CIA 1)
+   - control the bank of memory the VIC can access (CIA 2)
+   - communicate with serial bus devices such as disk drives (CIA 2)
+   - communicate on the user port (CIA 2) (The Serial port pin of CIA1 and CIA2 are also connected to the user port)
+see 02-io-ports.txt
+
+- 8 or 16-Bit handshaking on read or write
+
+- 2 independent, linkable 16-bit interval timers (Timer A and Timer B)
+  - write only 16 bit latch (timer start value)
+  - read only 16 bit counter
+  - same two registers are used to write to latch/read from counter
+  - timers are ticked on every cpu cycle
+see 03-interval-timers.txt
+
+- 24-hour (AM/PM) time of day (TOD) clock with programmable alarm
+see 04-time-of-day.txt
+
+- 8-Bit shift register for serial I/O
+  - the byte in the shift register is shifted bitwise to/from the SP (serial port) pin with every positive slope on the CNT (Count) pin
+
+CIA Interrupts
+--------------
+
+Each CIA can generate 5 sources of interrupts:
+
+- underflow from TIMER A 
+- underflow from TIMER B
+- TOD ALARM
+- Serial Port full/empty 
+- /FLAG. 
+
+CIA 1 IRQ pin is connected to the IRQ Line, CIA 2 IRQ pin is connected to the NMI line.
+
+see 05-interrupts.txt
+
+
+CIA Chip Pins
+-------------
+
+Vss	           Ground connection 0V
+PA0 - PA7      I/O Port A Bits 0-7 
+PB0 - PB7	     I/O-Port B Bits 0-7
+/PC            Port Control - Handshake output, Low pulse after read/write on port B.
+TOD            Time Of Day clock input, either 50Hz or 60Hz input.
+Vcc            5VDC input
+/IRQ           Interrupt Request, output to CPU's IRQ input
+R/W            High-level = Read (Move data from CIA), Low-level = Write (Move data to CIA)
+/CS            Chip Select - low level means active CIA.
+/FLAG          Negative edge IRQ input, can be used as handshake for either parallel port.
+/phi2          Processor Φ2 clock, data transfers occur only on high signal level.
+DB0 - DB7	     Data bus Bits 0 - 7
+/RES           Reset input, low signal initiates CIA.
+RS0 - RS3      Register Select - Used to interface internal registers with bidirectional ports.
+SP             Serial Port - bidirectional, internal shift register converts CPU parallel data into serial data and vice-versa.
+CNT            Count - Internal timers can count pulses to this input. Can be used for frequency dependent operations.
+
+
+References
+-----------
+
+Commodore datasheet for 6526
+http://archive.6502.org/datasheets/mos_6526_cia_recreated.pdf
+
+A Software Model of the cia 6526
+https://ist.uwaterloo.ca/~schepers/MJK/cia6526.html
+
+CIA 6526 Reference:
+http://www.oxyron.de/html/registers_cia.html
+
+
+IEC disceted
+http://www.zimmers.net/anonftp/pub/cbm/programming/serial-bus.pdf
+https://codebase64.org/doku.php?id=base:how_the_vic_64_serial_bus_works (HTML version)
+
+C64 wiki page on CIA
+https://www.c64-wiki.com/wiki/CIA
+

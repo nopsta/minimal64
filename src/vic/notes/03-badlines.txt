@@ -1,0 +1,18 @@
+Bad lines
+---------
+Usually VICII accesses the data bus in the first clock phase and the CPU accesses the data bus in the second clock phase.
+
+Typically the VIC will read the Video Matrix and Color RAM every 8 lines (see graphics-modes.txt for more on the Video Matrix and Color RAM). 
+It will read Character Data every line.
+
+1 clock phase isn't enough time for the VIC to access both the Video Matrix/Color RAM and the Character Generator data,
+so the VIC will "stun" the CPU for 40-43 cycles on raster lines where it needs to access the Video Matrix/Color RAM.
+
+It is called a "bad line" when the VIC stuns the CPU to read the Video Matrix/Color RAM
+
+A formal definition of a bad line condition involves the value of YSCROLL and the cycle position in the raster line:
+
+ A Bad Line Condition is given at any arbitrary clock cycle, if at the
+ negative edge of ø0 at the beginning of the cycle RASTER >= $30 (48) and RASTER
+ <= $f7 (247) and the lower three bits of RASTER are equal to YSCROLL and if the
+ DEN bit was set during an arbitrary cycle of raster line $30.

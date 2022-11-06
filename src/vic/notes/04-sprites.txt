@@ -1,0 +1,57 @@
+
+The movable image block (MIB) is a special type of display image which can be displayed at any screen position without the 8x8 dot
+block constraints inherent in character and bit map modes. Up to 8 unique MIBs can be displayed simultaneously, each defined by 63
+bytes in memory displayed as a 24x21 dot array
+
+
+
+Each Sprite is 63 bytes in memory (21 rows of 3 bytes )
+Each sprite has a pointer which when multiplied by 64, points to the sprite's data relative to Video Matrix Address
+Sprite pointers are 0x3f8 bytes after video matrix base
+
+Internally, every sprite has its own 24bit shift register, 
+this register holds the 3 bytes of sprite data for the current raster line
+
+Every sprite also has two 6 bit counters (0-63), MC (MOB Data Counter) and MCBASE (MOB Data Counter Base)
+
+MC is used to store which byte in the sprite is to be read next, so:
+
+  current sprite byte address = vic base address + (sprite pointer) * 64 + MC
+
+Sprite DMA starts if a sprite is enabled and the lowest 8 bits of the raster line is equal to y coordinate of the sprite
+When sprite DMA begins, MCBASE is set to 0
+
+Sprite DMA ends when MCBASE is equal to 63 (63 bytes in a sprite)
+
+MC is set to MCBASE for all sprites on a line cycle according to the chips timing (cycle 58 phi 1 for PAL)
+
+MCBASE is set to MC on a line cycle after sprite 7's data has been read (cycle 16 for PAL), unless the
+sprite has been expanded in the Y direction, in which case MCBASE is set to MC on every 2nd line (so sprite lines are doubled)
+
+
+Timing
+------
+
+2 cycles are used for each enabled sprite on each raster line to read sprite data:
+
+  cycle 1 phi 1: read sprite pointer
+  cycle 1 phi 2: read sprite byte, store in high 8 bits of shift register, increment mc
+  cycle 2 phi 1: read sprite byte, store in middle 8 bits of shift register, increment mc
+  cycle 2 phi 2: read sprite byte, store in low 8 bits of shift register, increment mc
+
+see timing in 6567.c and 6569.c for which cycles or look in http://www.zimmers.net/cbmpics/cbm/c64/vic-ii.txt
+
+
+If a sprite is enabled, the VIC will use 4 half cycles to read the sprite pointer and then 
+3 bytes of sprite data on every raster line where the sprite appears
+
+As for bad lines, the CPU will be "stunned" to enable this access in 2 cycles.
+BA will go low three cycles before the proper access 
+
+
+
+implementation of display of sprites:
+when the cpu cycle for the raster line reaches the x coordinate of the sprite divided by 8 (one cycle = 8 pixels)
+the data for the sprite is copied from the shift register into a 32 bit "consumed sprite data" number
+and shifted by the offset of the sprite into the 8 pixels for the 8, and the sprite is inserted into the 
+list of sprites to be displayed, it is displayed 8 pixels at a time
